@@ -1,12 +1,15 @@
 package imtui
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/mattn/go-runewidth"
 	"golang.org/x/xerrors"
 )
+
+var ErrNormalExit = errors.New("regular exit")
 
 type Tui struct {
 	s tcell.Screen
@@ -34,6 +37,9 @@ func (t *Tui) Run() error {
 	err := t.scene(t)
 	if err != nil {
 		t.s.Fini()
+		if xerrors.Is(err, ErrNormalExit) {
+			return nil
+		}
 		return xerrors.Errorf("scene returned an error: %w", err)
 	}
 
@@ -51,6 +57,9 @@ func (t *Tui) Run() error {
 			err := t.scene(t)
 			if err != nil {
 				t.s.Fini()
+				if xerrors.Is(err, ErrNormalExit) {
+					return nil
+				}
 				return xerrors.Errorf("scene returned an error: %w", err)
 			}
 			t.CurrentKey = nil
@@ -96,9 +105,8 @@ func (t *Tui) EditFieldFiltered(x, y, width int, text *string, filter func(rune)
 		*text = newText
 	}
 
-	str := fmt.Sprintf("%*s", width-1, *text)
+	str := fmt.Sprintf("%*s", width, *text)
 	w := t.emitStr(x, y, style, str)
-	w += t.emitStr(x+w, y, tcell.StyleDefault.Blink(true), " ")
 	return w
 }
 
