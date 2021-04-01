@@ -3,7 +3,6 @@ package imtui
 import (
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 
 	"github.com/gdamore/tcell/v2"
@@ -212,8 +211,6 @@ func (t *Tui) emitStr(x, xmax, y int, style tcell.Style, str string) int {
 	}
 	return x - xinit
 }
-
-var l = log.Default()
 
 func (t *Tui) FlexTable(y int, maxY, maxX int, sel, scroll *int, rows [][]string, flex []int, header bool) int {
 
